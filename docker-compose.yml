@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  taskmaster:
+    build: .
+    container_name: taskmaster-app
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+    volumes:
+      - ./tasks.db:/app/tasks.db
+    restart: unless-stopped
