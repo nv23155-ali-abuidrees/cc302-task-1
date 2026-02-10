@@ -60,6 +60,13 @@ docker run -p 5000:5000 -v $(pwd)/tasks.db:/app/tasks.db taskmaster:latest
    python appp.py
    ```
 
+4b. **Alternative: use the provided helper script**
+   ```bash
+   # make executable and run (from project root)
+   chmod +x scripts/run.sh
+   ./scripts/run.sh
+   ```
+
 5. **Open in browser**
    - Navigate to `http://localhost:5000`
 
