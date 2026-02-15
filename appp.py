@@ -17,6 +17,7 @@ DB_PATH = os.path.join(BASE_DIR, "tasks.db")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + DB_PATH
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
 app.config["SECRET_KEY"] = "dev"  # prevents some Flask warnings
 
 db = SQLAlchemy(app)
