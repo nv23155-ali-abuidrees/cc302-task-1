@@ -85,4 +85,5 @@ def toggle_important(id):
 # ---- Run app ----
 if __name__ == "__main__":
     # Bind to all interfaces so the app is reachable from outside the container
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    # When running under Gunicorn the __main__ block is not used.
+    app.run(host="0.0.0.0", port=5000, debug=False)
