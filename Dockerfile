@@ -21,4 +21,4 @@ ENV FLASK_ENV=production
 
 # Run the application using Gunicorn for production
 # Use a simple worker count; adjust based on available CPU
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "appp:app", "--workers", "2"]
+CMD ["python", "appp.py"]
