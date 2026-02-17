@@ -87,4 +87,33 @@ def toggle_important(id):
 if __name__ == "__main__":
     # Bind to all interfaces so the app is reachable from outside the container
     # When running under Gunicorn the __main__ block is not used.
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    import socket
+
+    def _find_free_port(start_port: int = 5000, max_port: int = 5100) -> int:
+        for p in range(start_port, max_port + 1):
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                try:
+                    s.bind(("0.0.0.0", p))
+                    return p
+                except OSError:
+                    continue
+        raise OSError("no free ports available")
+
+    # prefer PORT env var when provided
+    requested = int(os.environ.get("PORT", 5000))
+    port = requested
+    try:
+        # if requested port is busy, find next free port
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            try:
+                s.bind(("0.0.0.0", port))
+            except OSError:
+                port = _find_free_port(requested + 1)
+    except OSError:
+        print("No available ports to bind the Flask app; exiting.")
+        sys.exit(1)
+
+    if port != requested:
+        print(f"Port {requested} in use, starting on available port {port}.")
+
+    app.run(host="0.0.0.0", port=port, debug=False)
