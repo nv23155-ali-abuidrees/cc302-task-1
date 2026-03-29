@@ -116,4 +116,98 @@ if __name__ == "__main__":
     if port != requested:
         print(f"Port {requested} in use, starting on available port {port}.")
 
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(host="0.0.0.0", port=port, debug=False)Part A — Confirm your CI workflow exists (pre-req)
+Students must already have:
+
+.github/workflows/ci.yml
+
+It runs on pull_request (and ideally push to dev/main)
+
+✅ Quick check: open Actions tab → verify CI runs at least once.
+
+Part B — Create the Branch Rules (Quality Gate Setup)
+Option 1 (recommended): Protect dev first, then main
+Because students merge feature branches → dev first.
+
+Steps (GitHub UI)
+Go to your repo → Settings
+
+Find Rules or Branches
+
+Create a ruleset (or branch protection rule) for:
+
+dev
+
+Enable:
+
+✅ Require a pull request before merging
+
+✅ Require status checks to pass before merging
+
+Select required check(s) from the list:
+
+choose your CI job name (example: CI / test or lint-test)
+
+Save rule
+
+Repeat the same for main after dev is working.
+
+Part C — Prove the gate works (Fail → Block → Fix → Pass)
+This is the core of the lesson.
+
+Step 1: Make CI fail intentionally (safe controlled failure)
+Pick ONE of these:
+
+Break a test expectation (assert 200 → assert 201)
+
+Add a Python syntax error
+
+Add a failing assertion
+
+Commit to a feature branch and open PR into dev.
+
+Step 2: Observe the gate
+CI should fail (red)
+
+Merge button should show blocked:
+
+“Required checks have not passed”
+
+Step 3: Fix the issue
+Correct the code/test
+
+Push again to the same branch
+
+CI should go green
+
+Merge becomes available
+
+Step 4: Merge
+Merge PR → dev.
+
+Student Deliverables (Quick Formative Assessment: FA-Style)
+Students must submit one evidence pack zip containing:
+
+Evidence Required
+Screenshot: Branch protection / ruleset showing:
+
+PR required
+
+required status checks enabled
+
+Screenshot: PR where merge is blocked due to failed CI (red)
+
+Screenshot: PR where CI passes and merge becomes allowed (green)
+
+PR link (feature → dev)
+
+Short explanation (5–7 lines):
+
+What failed?
+
+Why was merge blocked?
+
+What did you change to pass?
+
+Submission Naming
+CC302_WXX_<StudentID>_Evidence.zip
