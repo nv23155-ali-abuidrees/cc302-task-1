@@ -20,7 +20,7 @@ def test_create_task(client):
     assert resp.status_code == 200
 
     # READ/VERIFY
-    assert "Buy milk" in resp.get_data(as_text=True)
+    assert "Buy wrong" in resp.get_data(as_text=True)
 
 def test_update_task(client):
     # CREATE first
