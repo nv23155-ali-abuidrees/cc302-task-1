@@ -40,16 +40,34 @@ with app.app_context():
 @app.route("/")
 def index():
     search_query = request.args.get("q", "").strip()
+    status_filter = request.args.get("status", "all")
+    sort_option = request.args.get("sort", "created_desc")
     tasks_query = Task.query
 
     if search_query:
         tasks_query = tasks_query.filter(Task.content.ilike(f"%{search_query}%"))
 
-    tasks = tasks_query.order_by(Task.id.desc()).all()
+    if status_filter == "completed":
+        tasks_query = tasks_query.filter_by(completed=True)
+    elif status_filter == "pending":
+        tasks_query = tasks_query.filter_by(completed=False)
+    elif status_filter == "important":
+        tasks_query = tasks_query.filter_by(important=True)
+
+    if sort_option == "created_asc":
+        tasks_query = tasks_query.order_by(Task.id.asc())
+    elif sort_option == "important_first":
+        tasks_query = tasks_query.order_by(Task.important.desc(), Task.id.desc())
+    else:
+        tasks_query = tasks_query.order_by(Task.id.desc())
+
+    tasks = tasks_query.all()
     return render_template(
         "index.html",
         tasks=tasks,
         search_query=search_query,
+        status_filter=status_filter,
+        sort_option=sort_option,
     )
 
 @app.route("/add", methods=["POST"])
