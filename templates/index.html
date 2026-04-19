@@ -237,7 +237,7 @@
             <div class="card-body">
                 <form method="GET" action="/">
                     <div class="row g-2 align-items-end">
-                        <div class="col-md-10">
+                        <div class="col-md-4">
                             <label class="form-label fw-bold mb-2">Search tasks</label>
                             <input
                                 type="search"
@@ -247,9 +247,26 @@
                                 value="{{ search_query|default('') }}"
                             >
                         </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold mb-2">Status</label>
+                            <select name="status" class="form-select">
+                                <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All</option>
+                                <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                                <option value="important" {% if status_filter == 'important' %}selected{% endif %}>Important</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold mb-2">Sort</label>
+                            <select name="sort" class="form-select">
+                                <option value="created_desc" {% if sort_option == 'created_desc' %}selected{% endif %}>Newest first</option>
+                                <option value="created_asc" {% if sort_option == 'created_asc' %}selected{% endif %}>Oldest first</option>
+                                <option value="important_first" {% if sort_option == 'important_first' %}selected{% endif %}>Important first</option>
+                            </select>
+                        </div>
                         <div class="col-md-2 text-end">
                             <button type="submit" class="btn btn-primary w-100 mt-4">
-                                <i class="fas fa-search"></i> Search
+                                <i class="fas fa-search"></i> Apply
                             </button>
                         </div>
                     </div>
