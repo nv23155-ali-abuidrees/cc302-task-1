@@ -62,12 +62,22 @@ def index():
         tasks_query = tasks_query.order_by(Task.id.desc())
 
     tasks = tasks_query.all()
+    stats = {
+        "total": Task.query.count(),
+        "completed": Task.query.filter_by(completed=True).count(),
+        "pending": Task.query.filter_by(completed=False).count(),
+        "important": Task.query.filter_by(important=True).count(),
+    }
+    completion_rate = round((stats["completed"] / stats["total"] * 100) if stats["total"] else 0)
+
     return render_template(
         "index.html",
         tasks=tasks,
         search_query=search_query,
         status_filter=status_filter,
         sort_option=sort_option,
+        stats=stats,
+        completion_rate=completion_rate,
     )
 
 @app.route("/add", methods=["POST"])

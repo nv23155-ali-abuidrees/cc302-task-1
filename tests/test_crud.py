@@ -44,6 +44,20 @@ def test_filter_completed_tasks(client):
     assert "Call Alice" not in resp.get_data(as_text=True)
 
 
+def test_stats_dashboard(client):
+    client.post("/add", data={"content": "Buy milk"}, follow_redirects=True)
+    client.post("/add", data={"content": "Call Alice"}, follow_redirects=True)
+    client.get("/complete/1", follow_redirects=True)
+
+    resp = client.get("/")
+    page = resp.get_data(as_text=True)
+    assert "Total Tasks" in page
+    assert "Completed" in page
+    assert "Pending" in page
+    assert "Important" in page
+    assert "1" in page
+
+
 def test_update_task(client):
     # CREATE first
     client.post("/add", data={"content": "Old title"}, follow_redirects=True)
