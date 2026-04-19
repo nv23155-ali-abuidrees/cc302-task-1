@@ -39,8 +39,18 @@ with app.app_context():
 # ---- Routes ----
 @app.route("/")
 def index():
-    tasks = Task.query.order_by(Task.id.desc()).all()
-    return render_template("index.html", tasks=tasks)
+    search_query = request.args.get("q", "").strip()
+    tasks_query = Task.query
+
+    if search_query:
+        tasks_query = tasks_query.filter(Task.content.ilike(f"%{search_query}%"))
+
+    tasks = tasks_query.order_by(Task.id.desc()).all()
+    return render_template(
+        "index.html",
+        tasks=tasks,
+        search_query=search_query,
+    )
 
 @app.route("/add", methods=["POST"])
 def add():

@@ -22,6 +22,17 @@ def test_create_task(client):
     # READ/VERIFY
     assert "Buy milk" in resp.get_data(as_text=True)
 
+
+def test_search_task(client):
+    client.post("/add", data={"content": "Buy milk"}, follow_redirects=True)
+    client.post("/add", data={"content": "Call Alice"}, follow_redirects=True)
+
+    resp = client.get("/?q=milk")
+    assert resp.status_code == 200
+    assert "Buy milk" in resp.get_data(as_text=True)
+    assert "Call Alice" not in resp.get_data(as_text=True)
+
+
 def test_update_task(client):
     # CREATE first
     client.post("/add", data={"content": "Old title"}, follow_redirects=True)
