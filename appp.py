@@ -39,8 +39,46 @@ with app.app_context():
 # ---- Routes ----
 @app.route("/")
 def index():
-    tasks = Task.query.order_by(Task.id.desc()).all()
-    return render_template("index.html", tasks=tasks)
+    search_query = request.args.get("q", "").strip()
+    status_filter = request.args.get("status", "all")
+    sort_option = request.args.get("sort", "created_desc")
+    tasks_query = Task.query
+
+    if search_query:
+        tasks_query = tasks_query.filter(Task.content.ilike(f"%{search_query}%"))
+
+    if status_filter == "completed":
+        tasks_query = tasks_query.filter_by(completed=True)
+    elif status_filter == "pending":
+        tasks_query = tasks_query.filter_by(completed=False)
+    elif status_filter == "important":
+        tasks_query = tasks_query.filter_by(important=True)
+
+    if sort_option == "created_asc":
+        tasks_query = tasks_query.order_by(Task.id.asc())
+    elif sort_option == "important_first":
+        tasks_query = tasks_query.order_by(Task.important.desc(), Task.id.desc())
+    else:
+        tasks_query = tasks_query.order_by(Task.id.desc())
+
+    tasks = tasks_query.all()
+    stats = {
+        "total": Task.query.count(),
+        "completed": Task.query.filter_by(completed=True).count(),
+        "pending": Task.query.filter_by(completed=False).count(),
+        "important": Task.query.filter_by(important=True).count(),
+    }
+    completion_rate = round((stats["completed"] / stats["total"] * 100) if stats["total"] else 0)
+
+    return render_template(
+        "index.html",
+        tasks=tasks,
+        search_query=search_query,
+        status_filter=status_filter,
+        sort_option=sort_option,
+        stats=stats,
+        completion_rate=completion_rate,
+    )
 
 @app.route("/add", methods=["POST"])
 def add():
@@ -116,98 +154,4 @@ if __name__ == "__main__":
     if port != requested:
         print(f"Port {requested} in use, starting on available port {port}.")
 
-    app.run(host="0.0.0.0", port=port, debug=False)Part A — Confirm your CI workflow exists (pre-req)
-Students must already have:
-
-.github/workflows/ci.yml
-
-It runs on pull_request (and ideally push to dev/main)
-
-✅ Quick check: open Actions tab → verify CI runs at least once.
-
-Part B — Create the Branch Rules (Quality Gate Setup)
-Option 1 (recommended): Protect dev first, then main
-Because students merge feature branches → dev first.
-
-Steps (GitHub UI)
-Go to your repo → Settings
-
-Find Rules or Branches
-
-Create a ruleset (or branch protection rule) for:
-
-dev
-
-Enable:
-
-✅ Require a pull request before merging
-
-✅ Require status checks to pass before merging
-
-Select required check(s) from the list:
-
-choose your CI job name (example: CI / test or lint-test)
-
-Save rule
-
-Repeat the same for main after dev is working.
-
-Part C — Prove the gate works (Fail → Block → Fix → Pass)
-This is the core of the lesson.
-
-Step 1: Make CI fail intentionally (safe controlled failure)
-Pick ONE of these:
-
-Break a test expectation (assert 200 → assert 201)
-
-Add a Python syntax error
-
-Add a failing assertion
-
-Commit to a feature branch and open PR into dev.
-
-Step 2: Observe the gate
-CI should fail (red)
-
-Merge button should show blocked:
-
-“Required checks have not passed”
-
-Step 3: Fix the issue
-Correct the code/test
-
-Push again to the same branch
-
-CI should go green
-
-Merge becomes available
-
-Step 4: Merge
-Merge PR → dev.
-
-Student Deliverables (Quick Formative Assessment: FA-Style)
-Students must submit one evidence pack zip containing:
-
-Evidence Required
-Screenshot: Branch protection / ruleset showing:
-
-PR required
-
-required status checks enabled
-
-Screenshot: PR where merge is blocked due to failed CI (red)
-
-Screenshot: PR where CI passes and merge becomes allowed (green)
-
-PR link (feature → dev)
-
-Short explanation (5–7 lines):
-
-What failed?
-
-Why was merge blocked?
-
-What did you change to pass?
-
-Submission Naming
-CC302_WXX_<StudentID>_Evidence.zip
+    app.run(host="0.0.0.0", port=port, debug=False)
